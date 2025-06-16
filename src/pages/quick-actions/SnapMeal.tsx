@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   Camera,
-  FlashOff,
+  ZapOff,
   Zap,
   RotateCcw,
   Image,
@@ -158,7 +158,7 @@ export default function SnapMeal() {
               {flashEnabled ? (
                 <Zap size={20} className="text-yellow-400" />
               ) : (
-                <FlashOff size={20} className="text-white" />
+                <ZapOff size={20} className="text-white" />
               )}
             </button>
           </div>
