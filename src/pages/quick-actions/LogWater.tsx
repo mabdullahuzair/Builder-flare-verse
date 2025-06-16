@@ -6,7 +6,6 @@ import {
   Plus,
   Minus,
   Check,
-  Cup,
   Coffee,
   Wine,
   Milk,
@@ -43,7 +42,7 @@ const drinkOptions: DrinkOption[] = [
   {
     id: "tea",
     name: "Tea",
-    icon: Cup,
+    icon: Coffee,
     volume: 200,
     color: "text-green-600",
   },
