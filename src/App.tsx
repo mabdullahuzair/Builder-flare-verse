@@ -36,6 +36,7 @@ import LogWater from "./pages/quick-actions/LogWater";
 
 const queryClient = new QueryClient();
 
+// MacroMate App - Force refresh to fix blank screen issue
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
