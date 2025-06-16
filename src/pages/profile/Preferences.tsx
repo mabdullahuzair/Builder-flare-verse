@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { CheatMealSettings } from "@/components/settings/CheatMealSettings";
 
 type WeightUnit = "kg" | "lbs";
 type HeightUnit = "cm" | "ft-in";
@@ -302,6 +303,15 @@ export default function Preferences() {
               ))}
             </div>
           </Card>
+        </motion.div>
+
+        {/* Cheat Meal Balancer Settings */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <CheatMealSettings />
         </motion.div>
 
         {/* Save Button */}

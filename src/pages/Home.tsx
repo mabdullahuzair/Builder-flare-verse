@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CalorieMacroRing } from "@/components/dashboard/CalorieMacroRing";
 import { VitalsCards } from "@/components/dashboard/VitalsCards";
 import { TodaysDiary } from "@/components/dashboard/TodaysDiary";
+import { QuickAccess } from "@/components/dashboard/QuickAccess";
 import { FloatingActionButton } from "@/components/ui/floating-action-button";
 import { RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
@@ -106,11 +107,20 @@ export default function Home() {
           <VitalsCards />
         </motion.div>
 
-        {/* Today's Diary */}
+        {/* Quick Access */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <QuickAccess />
+        </motion.div>
+
+        {/* Today's Diary */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
           <TodaysDiary />
         </motion.div>

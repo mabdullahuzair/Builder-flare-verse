@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Plus, Camera, Edit3, Scale, Droplets } from "lucide-react";
+import { Plus, Camera, Edit3, Scale, Droplets, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 interface FABMenuItem {
   id: string;
@@ -10,34 +11,42 @@ interface FABMenuItem {
   onClick: () => void;
 }
 
-const fabMenuItems: FABMenuItem[] = [
-  {
-    id: "snap-meal",
-    label: "Snap Meal",
-    icon: Camera,
-    onClick: () => console.log("Snap Meal"),
-  },
-  {
-    id: "manual-meal",
-    label: "Manual Meal",
-    icon: Edit3,
-    onClick: () => console.log("Manual Meal"),
-  },
-  {
-    id: "add-weight",
-    label: "Add Weight",
-    icon: Scale,
-    onClick: () => console.log("Add Weight"),
-  },
-  {
-    id: "log-water",
-    label: "Log Water",
-    icon: Droplets,
-    onClick: () => console.log("Log Water"),
-  },
-];
-
 export function FloatingActionButton() {
+  const navigate = useNavigate();
+
+  const fabMenuItems: FABMenuItem[] = [
+    {
+      id: "snap-meal",
+      label: "Snap Meal",
+      icon: Camera,
+      onClick: () => console.log("Snap Meal"),
+    },
+    {
+      id: "manual-meal",
+      label: "Manual Meal",
+      icon: Edit3,
+      onClick: () => console.log("Manual Meal"),
+    },
+    {
+      id: "cheat-meal-balance",
+      label: "Cheat Meal Balance",
+      icon: Sparkles,
+      onClick: () => navigate("/cheat-meal-balance"),
+    },
+    {
+      id: "add-weight",
+      label: "Add Weight",
+      icon: Scale,
+      onClick: () => console.log("Add Weight"),
+    },
+    {
+      id: "log-water",
+      label: "Log Water",
+      icon: Droplets,
+      onClick: () => console.log("Log Water"),
+    },
+  ];
+
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
