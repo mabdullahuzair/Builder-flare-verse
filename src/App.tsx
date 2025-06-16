@@ -9,6 +9,7 @@ import Log from "./pages/Log";
 import Workout from "./pages/Workout";
 import Progress from "./pages/Progress";
 import Profile from "./pages/Profile";
+import CheatMealBalance from "./pages/CheatMealBalance";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/workout" element={<Workout />} />
             <Route path="/progress" element={<Progress />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/cheat-meal-balance" element={<CheatMealBalance />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <BottomNavigation />
