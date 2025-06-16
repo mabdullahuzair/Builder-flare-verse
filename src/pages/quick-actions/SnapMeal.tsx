@@ -4,7 +4,7 @@ import {
   ArrowLeft,
   Camera,
   FlashOff,
-  Flash,
+  Zap,
   RotateCcw,
   Image,
   CheckCircle,
@@ -156,7 +156,7 @@ export default function SnapMeal() {
               className="p-2 rounded-full bg-black/30 backdrop-blur-sm"
             >
               {flashEnabled ? (
-                <Flash size={20} className="text-yellow-400" />
+                <Zap size={20} className="text-yellow-400" />
               ) : (
                 <FlashOff size={20} className="text-white" />
               )}
