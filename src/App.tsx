@@ -18,6 +18,7 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import VerifyEmail from "./pages/auth/VerifyEmail";
 
 // Profile pages
 import ProfileOverview from "./pages/profile/ProfileOverview";
@@ -49,6 +50,7 @@ const App = () => (
             <Route path="/auth/login" element={<Login />} />
             <Route path="/auth/signup" element={<Signup />} />
             <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+            <Route path="/auth/verify-email" element={<VerifyEmail />} />
 
             {/* Profile Sub-routes */}
             <Route path="/profile/overview" element={<ProfileOverview />} />
