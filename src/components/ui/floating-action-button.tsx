@@ -19,13 +19,13 @@ export function FloatingActionButton() {
       id: "snap-meal",
       label: "Snap Meal",
       icon: Camera,
-      onClick: () => console.log("Snap Meal"),
+      onClick: () => navigate("/quick-actions/snap-meal"),
     },
     {
       id: "manual-meal",
       label: "Manual Meal",
       icon: Edit3,
-      onClick: () => console.log("Manual Meal"),
+      onClick: () => navigate("/quick-actions/manual-meal"),
     },
     {
       id: "cheat-meal-balance",
@@ -37,13 +37,13 @@ export function FloatingActionButton() {
       id: "add-weight",
       label: "Add Weight",
       icon: Scale,
-      onClick: () => console.log("Add Weight"),
+      onClick: () => navigate("/quick-actions/add-weight"),
     },
     {
       id: "log-water",
       label: "Log Water",
       icon: Droplets,
-      onClick: () => console.log("Log Water"),
+      onClick: () => navigate("/quick-actions/log-water"),
     },
   ];
 

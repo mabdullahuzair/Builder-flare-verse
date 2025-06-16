@@ -28,6 +28,12 @@ import SecurityPrivacy from "./pages/profile/SecurityPrivacy";
 import Subscription from "./pages/profile/Subscription";
 import AboutLegal from "./pages/profile/AboutLegal";
 
+// Quick Action pages
+import SnapMeal from "./pages/quick-actions/SnapMeal";
+import ManualMeal from "./pages/quick-actions/ManualMeal";
+import AddWeight from "./pages/quick-actions/AddWeight";
+import LogWater from "./pages/quick-actions/LogWater";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -62,6 +68,12 @@ const App = () => (
             />
             <Route path="/profile/subscription" element={<Subscription />} />
             <Route path="/profile/about-legal" element={<AboutLegal />} />
+
+            {/* Quick Action Routes */}
+            <Route path="/quick-actions/snap-meal" element={<SnapMeal />} />
+            <Route path="/quick-actions/manual-meal" element={<ManualMeal />} />
+            <Route path="/quick-actions/add-weight" element={<AddWeight />} />
+            <Route path="/quick-actions/log-water" element={<LogWater />} />
 
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
