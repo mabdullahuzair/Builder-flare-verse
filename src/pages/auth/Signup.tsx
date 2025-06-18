@@ -65,7 +65,7 @@ export default function Signup() {
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      navigate("/auth/verify-email");
+      navigate("/onboarding/personal-info");
     }, 1500);
   };
 

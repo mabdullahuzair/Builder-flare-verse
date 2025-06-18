@@ -24,7 +24,15 @@ export default function Login() {
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      navigate("/");
+      // Check if user has completed onboarding
+      const isOnboardingComplete = localStorage.getItem(
+        "macromate_onboarding_complete",
+      );
+      if (isOnboardingComplete) {
+        navigate("/");
+      } else {
+        navigate("/onboarding/personal-info");
+      }
     }, 1500);
   };
 

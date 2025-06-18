@@ -46,7 +46,7 @@ export default function VerifyEmail() {
   };
 
   const handleContinue = () => {
-    navigate("/");
+    navigate("/onboarding/personal-info");
   };
 
   if (isVerified) {

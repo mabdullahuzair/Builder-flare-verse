@@ -34,6 +34,15 @@ import ManualMeal from "./pages/quick-actions/ManualMeal";
 import AddWeight from "./pages/quick-actions/AddWeight";
 import LogWater from "./pages/quick-actions/LogWater";
 
+// Onboarding pages
+import PersonalInfo from "./pages/onboarding/PersonalInfo";
+import Goals from "./pages/onboarding/Goals";
+import Permissions from "./pages/onboarding/Permissions";
+import Complete from "./pages/onboarding/Complete";
+
+// Guards
+import { OnboardingGuard } from "./components/OnboardingGuard";
+
 const queryClient = new QueryClient();
 
 // MacroMate App - Force refresh to fix blank screen issue
@@ -43,53 +52,79 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <div className="min-h-screen bg-neutral-50">
-          <Routes>
-            {/* Main App Routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/log" element={<Log />} />
-            <Route path="/workout" element={<Workout />} />
-            <Route path="/progress" element={<Progress />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/cheat-meal-balance" element={<CheatMealBalance />} />
+        <OnboardingGuard>
+          <div className="min-h-screen bg-neutral-50">
+            <Routes>
+              {/* Main App Routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/log" element={<Log />} />
+              <Route path="/workout" element={<Workout />} />
+              <Route path="/progress" element={<Progress />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route
+                path="/cheat-meal-balance"
+                element={<CheatMealBalance />}
+              />
 
-            {/* Authentication Routes */}
-            <Route path="/auth/login" element={<Login />} />
-            <Route path="/auth/signup" element={<Signup />} />
-            <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-            <Route path="/auth/verify-email" element={<VerifyEmail />} />
+              {/* Authentication Routes */}
+              <Route path="/auth/login" element={<Login />} />
+              <Route path="/auth/signup" element={<Signup />} />
+              <Route
+                path="/auth/forgot-password"
+                element={<ForgotPassword />}
+              />
+              <Route path="/auth/verify-email" element={<VerifyEmail />} />
 
-            {/* Profile Sub-routes */}
-            <Route path="/profile/overview" element={<ProfileOverview />} />
-            <Route path="/profile/preferences" element={<Preferences />} />
-            <Route path="/profile/connected-apps" element={<ConnectedApps />} />
-            <Route
-              path="/profile/security-privacy"
-              element={<SecurityPrivacy />}
-            />
-            <Route path="/profile/subscription" element={<Subscription />} />
-            <Route path="/profile/about-legal" element={<AboutLegal />} />
+              {/* Profile Sub-routes */}
+              <Route path="/profile/overview" element={<ProfileOverview />} />
+              <Route path="/profile/preferences" element={<Preferences />} />
+              <Route
+                path="/profile/connected-apps"
+                element={<ConnectedApps />}
+              />
+              <Route
+                path="/profile/security-privacy"
+                element={<SecurityPrivacy />}
+              />
+              <Route path="/profile/subscription" element={<Subscription />} />
+              <Route path="/profile/about-legal" element={<AboutLegal />} />
 
-            {/* Quick Action Routes */}
-            <Route path="/quick-actions/snap-meal" element={<SnapMeal />} />
-            <Route path="/quick-actions/manual-meal" element={<ManualMeal />} />
-            <Route path="/quick-actions/add-weight" element={<AddWeight />} />
-            <Route path="/quick-actions/log-water" element={<LogWater />} />
+              {/* Quick Action Routes */}
+              <Route path="/quick-actions/snap-meal" element={<SnapMeal />} />
+              <Route
+                path="/quick-actions/manual-meal"
+                element={<ManualMeal />}
+              />
+              <Route path="/quick-actions/add-weight" element={<AddWeight />} />
+              <Route path="/quick-actions/log-water" element={<LogWater />} />
 
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              {/* Onboarding Routes */}
+              <Route
+                path="/onboarding/personal-info"
+                element={<PersonalInfo />}
+              />
+              <Route path="/onboarding/goals" element={<Goals />} />
+              <Route path="/onboarding/permissions" element={<Permissions />} />
+              <Route path="/onboarding/complete" element={<Complete />} />
 
-          {/* Only show bottom navigation on main app routes */}
-          <Routes>
-            <Route path="/" element={<BottomNavigation />} />
-            <Route path="/log" element={<BottomNavigation />} />
-            <Route path="/workout" element={<BottomNavigation />} />
-            <Route path="/progress" element={<BottomNavigation />} />
-            <Route path="/profile" element={<BottomNavigation />} />
-            <Route path="/cheat-meal-balance" element={<BottomNavigation />} />
-          </Routes>
-        </div>
+              {/* Catch-all route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+
+            {/* Only show bottom navigation on main app routes */}
+            <Routes>
+              <Route path="/" element={<BottomNavigation />} />
+              <Route path="/log" element={<BottomNavigation />} />
+              <Route path="/workout" element={<BottomNavigation />} />
+              <Route path="/progress" element={<BottomNavigation />} />
+              <Route path="/profile" element={<BottomNavigation />} />
+              <Route
+                path="/cheat-meal-balance"
+                element={<BottomNavigation />}
+              />
+            </Routes>
+          </div>
+        </OnboardingGuard>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
