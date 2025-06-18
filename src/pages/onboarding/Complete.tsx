@@ -29,6 +29,41 @@ export default function Complete() {
     navigate("/");
   };
 
+  const calculateBMI = () => {
+    if (!userInfo.weight || !userInfo.height) return 0;
+
+    const weight = parseFloat(userInfo.weight);
+    const height = parseFloat(userInfo.height);
+
+    let heightInMeters = height;
+
+    // Convert height to meters
+    if (userInfo.heightUnit === "ft-in") {
+      if (height.toString().includes("'")) {
+        const heightStr = height.toString();
+        const feet = parseInt(heightStr.split("'")[0] || "0");
+        const inches = parseInt(
+          heightStr.split("'")[1]?.replace('"', "") || "0",
+        );
+        heightInMeters = (feet * 12 + inches) * 0.0254;
+      } else {
+        heightInMeters = height * 0.3048;
+      }
+    } else {
+      heightInMeters = height / 100;
+    }
+
+    // Convert weight to kg if needed
+    let weightInKg = weight;
+    if (userInfo.weightUnit === "lbs") {
+      weightInKg = weight * 0.453592;
+    }
+
+    return weightInKg / (heightInMeters * heightInMeters);
+  };
+
+  const currentBMI = calculateBMI();
+
   const features = [
     {
       icon: Sparkles,
@@ -95,7 +130,7 @@ export default function Complete() {
               <h3 className="font-semibold text-text-primary mb-4">
                 Your Profile
               </h3>
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="text-center p-3 bg-neutral-50 rounded-lg">
                   <div className="font-bold text-text-primary">
                     {userInfo.age}
@@ -115,12 +150,40 @@ export default function Complete() {
                   <div className="text-neutral-600">height</div>
                 </div>
                 <div className="text-center p-3 bg-neutral-50 rounded-lg">
-                  <div className="font-bold text-brand-primary capitalize">
-                    {goals.goal} weight
+                  <div className="font-bold text-brand-primary">
+                    {currentBMI > 0 ? currentBMI.toFixed(1) : "N/A"}
                   </div>
-                  <div className="text-neutral-600">goal</div>
+                  <div className="text-neutral-600">current BMI</div>
                 </div>
               </div>
+
+              {goals.goal !== "maintain" && goals.targetWeight && (
+                <div className="mt-4 p-4 bg-gradient-to-r from-brand-primary/10 to-brand-secondary/10 rounded-lg">
+                  <h4 className="font-medium text-text-primary mb-2 text-center">
+                    Your Goal
+                  </h4>
+                  <div className="flex items-center justify-center gap-6 text-sm">
+                    <div className="text-center">
+                      <div className="font-bold text-brand-primary">
+                        {goals.targetWeight} {userInfo.weightUnit}
+                      </div>
+                      <div className="text-neutral-600">target weight</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="font-bold text-success capitalize">
+                        {goals.goal} weight
+                      </div>
+                      <div className="text-neutral-600">goal type</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="font-bold text-warning">
+                        {goals.timeline} weeks
+                      </div>
+                      <div className="text-neutral-600">timeline</div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </Card>
           </motion.div>
 
