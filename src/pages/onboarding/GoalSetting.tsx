@@ -126,7 +126,8 @@ const weightLossRates = [
     id: "aggressive" as WeightChangeRate,
     title: "Aggressive",
     description: "1 kg / 2 lbs per week",
-    subtitle: "Max limit for short-term goals. Only for users with significant weight to lose",
+    subtitle:
+      "Max limit for short-term goals. Only for users with significant weight to lose",
     warning: "Not suitable for everyone—can be hard to maintain",
     lbsPerWeek: 2,
     kgPerWeek: 1,
@@ -167,7 +168,8 @@ const weightGainRates = [
     id: "aggressive" as WeightChangeRate,
     title: "Very Aggressive",
     description: "1 kg / 2 lbs per week",
-    subtitle: "Only recommended for underweight users or advanced bulking cycles",
+    subtitle:
+      "Only recommended for underweight users or advanced bulking cycles",
     warning: "Risk of higher fat gain",
     lbsPerWeek: 2,
     kgPerWeek: 1,
@@ -201,6 +203,43 @@ export default function GoalSetting() {
       localStorage.setItem("macromate_goal_setting", JSON.stringify(goalData));
       navigate("/onboarding/activity-level");
     }
+  };
+
+  const calculateCalories = () => {
+    if (
+      !basicInfo.age ||
+      !basicInfo.weight ||
+      !basicInfo.height ||
+      !selectedRate
+    )
+      return 0;
+
+    const weight = parseFloat(basicInfo.weight);
+    const age = parseInt(basicInfo.age);
+    let height = parseFloat(basicInfo.height);
+
+    // Convert height to cm if needed
+    if (basicInfo.heightUnit === "ft-in") {
+      // Simple conversion for demo - in real app would parse properly
+      height = height * 30.48; // rough conversion
+    }
+
+    // Basic BMR calculation (Mifflin-St Jeor)
+    const bmr = 10 * weight + 6.25 * height - 5 * age + 5; // for males, subtract 161 for females
+
+    const activityMultiplier = 1.2; // sedentary baseline
+    const tdee = bmr * activityMultiplier;
+
+    // Adjust based on goal and rate
+    if (selectedGoal === "lose") {
+      const lossRate = weightLossRates.find((r) => r.id === selectedRate);
+      return Math.round(tdee - (lossRate?.calorieDeficit || 500));
+    }
+    if (selectedGoal === "gain") {
+      const gainRate = weightGainRates.find((r) => r.id === selectedRate);
+      return Math.round(tdee + (gainRate?.calorieSurplus || 500));
+    }
+    return Math.round(tdee);
   };
 
   const needsTargetWeight = selectedGoal === "lose" || selectedGoal === "gain";
@@ -367,7 +406,7 @@ export default function GoalSetting() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="space-y-3"
+              className="space-y-4"
             >
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold text-text-primary">
@@ -379,50 +418,41 @@ export default function GoalSetting() {
               </div>
 
               <div className="space-y-3">
-              {selectedGoal !== "maintain" && targetWeight && basicInfo.weight && selectedRate && (
-                <Card className="p-4 bg-gradient-to-br from-neutral-50 to-neutral-100">
-                  <div className="space-y-3">
-                    <h4 className="font-medium text-text-primary">Goal Summary</h4>
-                    <div className="grid grid-cols-3 gap-4 text-center text-sm">
-                      <div>
-                        <div className="font-bold text-neutral-700">
-                          {Math.abs(parseFloat(targetWeight) - parseFloat(basicInfo.weight)).toFixed(1)}
-                        </div>
-                        <div className="text-neutral-600">
-                          {basicInfo.weightUnit} to {selectedGoal}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="font-bold text-brand-primary">
-                          {basicInfo.weightUnit === "lbs"
-                            ? (selectedGoal === "lose" ? weightLossRates : weightGainRates)
-                              .find(r => r.id === selectedRate)?.lbsPerWeek
-                            : (selectedGoal === "lose" ? weightLossRates : weightGainRates)
-                              .find(r => r.id === selectedRate)?.kgPerWeek
-                          }
-                        </div>
-                        <div className="text-neutral-600">
-                          {basicInfo.weightUnit}/week
-                        </div>
-                      </div>
-                      <div>
-                        <div className="font-bold text-green-600">
-                          {(
-                            Math.abs(parseFloat(targetWeight) - parseFloat(basicInfo.weight)) /
-                            (basicInfo.weightUnit === "lbs"
-                              ? (selectedGoal === "lose" ? weightLossRates : weightGainRates)
-                                .find(r => r.id === selectedRate)?.lbsPerWeek || 1
-                              : (selectedGoal === "lose" ? weightLossRates : weightGainRates)
-                                .find(r => r.id === selectedRate)?.kgPerWeek || 0.5
-                            )
-                          ).toFixed(0)}
-                        </div>
-                        <div className="text-neutral-600">weeks needed</div>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              )}
+                {(selectedGoal === "lose"
+                  ? weightLossRates
+                  : weightGainRates
+                ).map((rate, index) => (
+                  <motion.div
+                    key={rate.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 + index * 0.05 }}
+                  >
+                    <Card
+                      className={`p-4 cursor-pointer transition-all ${
+                        selectedRate === rate.id
+                          ? "border-brand-primary bg-brand-primary/5 border-2"
+                          : "hover:border-neutral-200 border"
+                      }`}
+                      onClick={() => setSelectedRate(rate.id)}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h5 className="font-medium text-text-primary">
+                              {rate.title}
+                            </h5>
+                            <span className="text-sm font-medium text-brand-primary">
+                              {basicInfo.weightUnit === "lbs"
+                                ? `${rate.lbsPerWeek} lbs/week`
+                                : `${rate.kgPerWeek} kg/week`}
+                            </span>
+                          </div>
+                          <p className="text-sm text-neutral-600 mb-2">
+                            {rate.subtitle}
+                          </p>
+                          {rate.warning && (
+                            <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg p-2">
                               <span className="text-amber-600 text-xs">⚠️</span>
                               <span className="text-xs text-amber-700">
                                 {rate.warning}
@@ -450,7 +480,9 @@ export default function GoalSetting() {
                 <div className="flex items-center gap-2">
                   <span className="text-green-600">💡</span>
                   <p className="text-sm text-green-700">
-                    <strong>Recommended:</strong> We suggest aiming for 0.5–1.0 {basicInfo.weightUnit}/week for healthy, sustainable progress.
+                    <strong>Recommended:</strong> We suggest aiming for 0.5–1.0{" "}
+                    {basicInfo.weightUnit}/week for healthy, sustainable
+                    progress.
                   </p>
                 </div>
               </div>
@@ -469,14 +501,107 @@ export default function GoalSetting() {
                         Aggressive Rate Selected
                       </h4>
                       <p className="text-sm text-orange-700">
-                        This rate is harder to sustain and may not be suitable for everyone.
-                        Please consult a health professional if you're unsure. Consider starting
-                        with a moderate approach first.
+                        This rate is harder to sustain and may not be suitable
+                        for everyone. Please consult a health professional if
+                        you're unsure. Consider starting with a moderate
+                        approach first.
                       </p>
                     </div>
                   </div>
                 </motion.div>
               )}
+
+              {/* Goal Summary */}
+              {targetWeight && basicInfo.weight && selectedRate && (
+                <Card className="p-4 bg-gradient-to-br from-neutral-50 to-neutral-100">
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-text-primary">
+                      Goal Summary
+                    </h4>
+                    <div className="grid grid-cols-3 gap-4 text-center text-sm">
+                      <div>
+                        <div className="font-bold text-neutral-700">
+                          {Math.abs(
+                            parseFloat(targetWeight) -
+                              parseFloat(basicInfo.weight),
+                          ).toFixed(1)}
+                        </div>
+                        <div className="text-neutral-600">
+                          {basicInfo.weightUnit} to {selectedGoal}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-bold text-brand-primary">
+                          {basicInfo.weightUnit === "lbs"
+                            ? (selectedGoal === "lose"
+                                ? weightLossRates
+                                : weightGainRates
+                              ).find((r) => r.id === selectedRate)?.lbsPerWeek
+                            : (selectedGoal === "lose"
+                                ? weightLossRates
+                                : weightGainRates
+                              ).find((r) => r.id === selectedRate)?.kgPerWeek}
+                        </div>
+                        <div className="text-neutral-600">
+                          {basicInfo.weightUnit}/week
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-bold text-green-600">
+                          {(
+                            Math.abs(
+                              parseFloat(targetWeight) -
+                                parseFloat(basicInfo.weight),
+                            ) /
+                            (basicInfo.weightUnit === "lbs"
+                              ? (selectedGoal === "lose"
+                                  ? weightLossRates
+                                  : weightGainRates
+                                ).find((r) => r.id === selectedRate)
+                                  ?.lbsPerWeek || 1
+                              : (selectedGoal === "lose"
+                                  ? weightLossRates
+                                  : weightGainRates
+                                ).find((r) => r.id === selectedRate)
+                                  ?.kgPerWeek || 0.5)
+                          ).toFixed(0)}
+                        </div>
+                        <div className="text-neutral-600">weeks needed</div>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              )}
+            </motion.div>
+          )}
+
+          {/* Calculated Calories */}
+          {selectedGoal && selectedRate && targetWeight && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.6 }}
+            >
+              <Card className="p-6 bg-gradient-to-br from-brand-primary/5 to-brand-secondary/5 border-brand-primary/20">
+                <div className="text-center">
+                  <h4 className="font-semibold text-text-primary mb-2">
+                    Your Daily Calorie Goal
+                  </h4>
+                  <div className="text-3xl font-bold text-brand-primary mb-2">
+                    {calculateCalories().toLocaleString()}
+                  </div>
+                  <p className="text-sm text-neutral-600">
+                    Based on your {selectedGoal} weight goal at a{" "}
+                    {(selectedGoal === "lose"
+                      ? weightLossRates
+                      : weightGainRates
+                    )
+                      .find((r) => r.id === selectedRate)
+                      ?.title.toLowerCase()}{" "}
+                    pace
+                  </p>
+                </div>
+              </Card>
             </motion.div>
           )}
 
@@ -484,7 +609,7 @@ export default function GoalSetting() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
+            transition={{ delay: 0.8 }}
             className="pt-4"
           >
             <Button
