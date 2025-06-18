@@ -16,11 +16,18 @@ export function BMICalculator() {
 
     // Convert height to meters
     if (heightUnit === "ft-in") {
-      // Parse format like "5'9\""
+      // Parse format like "5'9\"" or simple decimal for feet
       const heightStr = height.toString();
-      const feet = parseInt(heightStr.split("'")[0] || "0");
-      const inches = parseInt(heightStr.split("'")[1]?.replace('"', "") || "0");
-      heightInMeters = (feet * 12 + inches) * 0.0254;
+      if (heightStr.includes("'")) {
+        const feet = parseInt(heightStr.split("'")[0] || "0");
+        const inches = parseInt(
+          heightStr.split("'")[1]?.replace('"', "") || "0",
+        );
+        heightInMeters = (feet * 12 + inches) * 0.0254;
+      } else {
+        // Simple decimal feet (e.g., 5.75)
+        heightInMeters = height * 0.3048;
+      }
     } else {
       heightInMeters = height / 100; // cm to meters
     }
