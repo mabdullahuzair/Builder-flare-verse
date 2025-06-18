@@ -6,6 +6,7 @@ import { TodaysDiary } from "@/components/dashboard/TodaysDiary";
 import { QuickAccess } from "@/components/dashboard/QuickAccess";
 import { BMICalculator } from "@/components/dashboard/BMICalculator";
 import { FloatingActionButton } from "@/components/ui/floating-action-button";
+import { DemoReset } from "@/components/DemoReset";
 import { RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -181,6 +182,9 @@ export default function Home() {
 
       {/* Floating Action Button */}
       <FloatingActionButton />
+
+      {/* Demo Reset Button */}
+      <DemoReset />
     </div>
   );
 }
