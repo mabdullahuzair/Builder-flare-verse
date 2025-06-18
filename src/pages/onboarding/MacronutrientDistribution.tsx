@@ -224,7 +224,7 @@ export default function MacronutrientDistribution() {
         "macromate_macro_distribution",
         JSON.stringify(macroData),
       );
-      navigate("/onboarding/dietary-preferences");
+      navigate("/onboarding/tracking-preferences");
     }
   };
 

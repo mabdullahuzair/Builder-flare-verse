@@ -151,7 +151,7 @@ export default function DietaryPreferences() {
         "macromate_dietary_preferences",
         JSON.stringify(dietaryData),
       );
-      navigate("/onboarding/food-preferences");
+      navigate("/onboarding/macro-distribution");
     }
   };
 

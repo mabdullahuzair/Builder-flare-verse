@@ -138,7 +138,7 @@ export default function TrackingPreferences() {
         "macromate_tracking_preferences",
         JSON.stringify(trackingData),
       );
-      navigate("/onboarding/health-conditions");
+      navigate("/onboarding/meal-preferences");
     }
   };
 
