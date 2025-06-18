@@ -25,17 +25,92 @@ export function CalorieMacroRing({
 }: CalorieMacroRingProps) {
   const navigate = useNavigate();
 
-  // Get macro distribution data from onboarding
+  // Get comprehensive data from onboarding
+  const personalInfo = JSON.parse(
+    localStorage.getItem("macromate_personal_info") || "{}",
+  );
+  const goalData = JSON.parse(
+    localStorage.getItem("macromate_primary_goal") || "{}",
+  );
+  const activityData = JSON.parse(
+    localStorage.getItem("macromate_activity_level") || "{}",
+  );
   const macroData = JSON.parse(
-    localStorage.getItem("macromate_macro_distribution") ||
-      '{"dailyCalories": 2200, "proteinGrams": 165, "carbGrams": 275, "fatGrams": 73}',
+    localStorage.getItem("macromate_macro_distribution") || "{}",
   );
 
+  // Calculate accurate daily calories if not stored
+  const calculateAccurateCalories = () => {
+    if (macroData.dailyCalories) return macroData.dailyCalories;
+
+    if (!personalInfo.age || !personalInfo.weight || !personalInfo.height) {
+      return 2200; // Fallback
+    }
+
+    // Use proper calculation
+    let weightInKg = parseFloat(personalInfo.weight);
+    let heightInCm = 0;
+    const age = parseInt(personalInfo.age);
+    const isMale = personalInfo.gender === "male";
+
+    // Convert weight to kg if needed
+    if (personalInfo.weightUnit === "lbs") {
+      weightInKg = weightInKg / 2.205;
+    }
+
+    // Convert height to cm
+    if (personalInfo.heightUnit === "ft-in") {
+      if (personalInfo.height.includes("'")) {
+        const parts = personalInfo.height.split("'");
+        const feet = parseFloat(parts[0]);
+        const inches = parseFloat(parts[1].replace('"', "")) || 0;
+        heightInCm = (feet * 12 + inches) * 2.54;
+      } else {
+        heightInCm = parseFloat(personalInfo.height) * 30.48;
+      }
+    } else {
+      heightInCm = parseFloat(personalInfo.height);
+    }
+
+    // Mifflin-St Jeor BMR calculation
+    let bmr = 10 * weightInKg + 6.25 * heightInCm - 5 * age;
+    if (isMale) {
+      bmr += 5;
+    } else {
+      bmr -= 161;
+    }
+
+    // Apply activity multiplier
+    const activityMultiplier = activityData.activityMultiplier || 1.2;
+    let tdee = bmr * activityMultiplier;
+
+    // Apply goal-based calorie adjustment
+    if (goalData.calorieAdjustment) {
+      if (goalData.primaryGoal === "lose") {
+        tdee -= goalData.calorieAdjustment;
+      } else if (goalData.primaryGoal === "gain") {
+        tdee += goalData.calorieAdjustment;
+      }
+    }
+
+    return Math.round(Math.max(tdee, 1200)); // Minimum 1200 calories
+  };
+
   // Use provided props or fallback to calculated data
-  const actualTargetCalories = targetCalories || macroData.dailyCalories;
-  const actualTargetProtein = targetProtein || macroData.proteinGrams;
-  const actualTargetCarbs = targetCarbs || macroData.carbGrams;
-  const actualTargetFats = targetFats || macroData.fatGrams;
+  const calculatedCalories = calculateAccurateCalories();
+  const actualTargetCalories = targetCalories || calculatedCalories;
+  const actualTargetProtein =
+    targetProtein ||
+    macroData.proteinGrams ||
+    Math.round((calculatedCalories * 0.2) / 4);
+  const actualTargetCarbs =
+    targetCarbs ||
+    macroData.carbGrams ||
+    Math.round((calculatedCalories * 0.5) / 4);
+  const actualTargetFats =
+    targetFats ||
+    macroData.fatGrams ||
+    Math.round((calculatedCalories * 0.3) / 9);
 
   // Mock consumed data - in real app, this would come from today's food logs
   const actualCalories = calories || 1299;
