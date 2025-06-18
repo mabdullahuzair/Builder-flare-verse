@@ -35,10 +35,22 @@ import AddWeight from "./pages/quick-actions/AddWeight";
 import LogWater from "./pages/quick-actions/LogWater";
 
 // Onboarding pages
-import PersonalInfo from "./pages/onboarding/PersonalInfo";
-import Goals from "./pages/onboarding/Goals";
-import Permissions from "./pages/onboarding/Permissions";
-import Complete from "./pages/onboarding/Complete";
+import {
+  BasicInfo,
+  GoalSetting,
+  ActivityLevel,
+  DietaryPreferences,
+  FoodPreferences,
+  TrackingPreferences,
+  HealthConditions,
+  LifestyleMotivation,
+  UnitsPreference,
+  FinalComplete,
+  PersonalInfo,
+  Goals,
+  Permissions,
+  Complete,
+} from "./pages/onboarding";
 
 // Guards
 import { OnboardingGuard } from "./components/OnboardingGuard";

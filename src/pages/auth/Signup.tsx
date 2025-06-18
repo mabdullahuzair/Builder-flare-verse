@@ -65,7 +65,8 @@ export default function Signup() {
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      navigate("/onboarding/personal-info");
+      // Navigate to comprehensive onboarding after successful signup
+      navigate("/onboarding/basic-info");
     }, 1500);
   };
 
