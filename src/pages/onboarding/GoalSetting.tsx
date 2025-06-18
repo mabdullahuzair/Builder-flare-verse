@@ -371,11 +371,20 @@ export default function GoalSetting() {
               transition={{ delay: 0.4 }}
               className="space-y-3"
             >
-              <h3 className="font-semibold text-text-primary">
-                At what rate do you want to {getWeightChangeLabel()} weight?
-              </h3>
-              <div className="space-y-2">
-                {weightChangeRates.map((rate, index) => (
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-text-primary">
+                  How quickly do you want to {getWeightChangeLabel()} weight?
+                </h3>
+                <div className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">
+                  ℹ️ Safe rates only
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {(selectedGoal === "lose"
+                  ? weightLossRates
+                  : weightGainRates
+                ).map((rate, index) => (
                   <motion.div
                     key={rate.id}
                     initial={{ opacity: 0, x: -20 }}
@@ -390,31 +399,37 @@ export default function GoalSetting() {
                       }`}
                       onClick={() => setSelectedRate(rate.id)}
                     >
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
+                          <div className="flex items-center gap-2 mb-2">
                             <h5 className="font-medium text-text-primary">
                               {rate.title}
                             </h5>
-                            {rate.id !== "custom" && (
-                              <span className="text-sm text-neutral-600">
-                                {basicInfo.weightUnit === "lbs"
-                                  ? `${rate.lbsPerWeek} lbs/week`
-                                  : `${rate.kgPerWeek} kg/week`}
-                              </span>
-                            )}
+                            <span className="text-sm font-medium text-brand-primary">
+                              {basicInfo.weightUnit === "lbs"
+                                ? `${rate.lbsPerWeek} lbs/week`
+                                : `${rate.kgPerWeek} kg/week`}
+                            </span>
                           </div>
-                          <p className="text-xs text-neutral-600">
+                          <p className="text-sm text-neutral-600 mb-2">
                             {rate.subtitle}
                           </p>
+                          {rate.warning && (
+                            <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg p-2">
+                              <span className="text-amber-600 text-xs">⚠️</span>
+                              <span className="text-xs text-amber-700">
+                                {rate.warning}
+                              </span>
+                            </div>
+                          )}
                         </div>
                         {selectedRate === rate.id && (
                           <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            className="w-5 h-5 rounded-full bg-brand-primary flex items-center justify-center"
+                            className="w-6 h-6 rounded-full bg-brand-primary flex items-center justify-center ml-3"
                           >
-                            <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                            <div className="w-2 h-2 rounded-full bg-white" />
                           </motion.div>
                         )}
                       </div>
@@ -423,36 +438,39 @@ export default function GoalSetting() {
                 ))}
               </div>
 
-              {/* Custom Rate Input */}
-              {selectedRate === "custom" && (
+              {/* Recommendation Note */}
+              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <span className="text-green-600">💡</span>
+                  <p className="text-sm text-green-700">
+                    <strong>Recommended:</strong> We suggest aiming for 0.5–1.0{" "}
+                    {basicInfo.weightUnit}/week for healthy, sustainable
+                    progress.
+                  </p>
+                </div>
+              </div>
+
+              {/* Aggressive Warning */}
+              {selectedRate === "aggressive" && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
-                  className="mt-3"
+                  className="p-4 bg-orange-50 border border-orange-200 rounded-lg"
                 >
-                  <Label className="text-sm font-medium text-text-primary">
-                    Custom rate ({basicInfo.weightUnit}/week)
-                  </Label>
-                  <div className="relative mt-2">
-                    <Input
-                      type="number"
-                      value={customRate}
-                      onChange={(e) => setCustomRate(e.target.value)}
-                      placeholder="0.7"
-                      className="h-12 pr-16 text-center"
-                      step="0.1"
-                      min="0.1"
-                      max={basicInfo.weightUnit === "lbs" ? "3" : "1.5"}
-                    />
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-500 text-sm">
-                      {basicInfo.weightUnit}/week
-                    </span>
+                  <div className="flex items-start gap-3">
+                    <span className="text-orange-600 text-lg">⚠️</span>
+                    <div>
+                      <h4 className="font-medium text-orange-800 mb-1">
+                        Aggressive Rate Selected
+                      </h4>
+                      <p className="text-sm text-orange-700">
+                        This rate is harder to sustain and may not be suitable
+                        for everyone. Please consult a health professional if
+                        you're unsure. Consider starting with a moderate
+                        approach first.
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-xs text-neutral-600 mt-1">
-                    Recommended: 0.1 to{" "}
-                    {basicInfo.weightUnit === "lbs" ? "2" : "1"}{" "}
-                    {basicInfo.weightUnit}/week
-                  </p>
                 </motion.div>
               )}
             </motion.div>
