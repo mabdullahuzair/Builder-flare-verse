@@ -43,6 +43,9 @@ import Complete from "./pages/onboarding/Complete";
 // Guards
 import { OnboardingGuard } from "./components/OnboardingGuard";
 
+// Splash
+import Splash from "./pages/Splash";
+
 const queryClient = new QueryClient();
 
 // MacroMate App - Force refresh to fix blank screen issue
@@ -55,6 +58,9 @@ const App = () => (
         <OnboardingGuard>
           <div className="min-h-screen bg-neutral-50">
             <Routes>
+              {/* Splash Screen */}
+              <Route path="/splash" element={<Splash />} />
+
               {/* Main App Routes */}
               <Route path="/" element={<Home />} />
               <Route path="/log" element={<Log />} />

@@ -17,10 +17,17 @@ export function OnboardingGuard({ children }: OnboardingGuardProps) {
       );
       const isOnboardingRoute = location.pathname.startsWith("/onboarding");
       const isAuthRoute = location.pathname.startsWith("/auth");
+      const isSplashRoute = location.pathname === "/splash";
+
+      // If on splash route, let it handle routing
+      if (isSplashRoute) {
+        setIsChecking(false);
+        return;
+      }
 
       // If user hasn't completed onboarding and is not on an auth or onboarding route
       if (!isOnboardingComplete && !isOnboardingRoute && !isAuthRoute) {
-        navigate("/auth/signup");
+        navigate("/splash");
       }
       // If user has completed onboarding but is on an onboarding route (except via direct navigation)
       else if (isOnboardingComplete && isOnboardingRoute) {
