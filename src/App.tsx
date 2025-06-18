@@ -104,7 +104,46 @@ const App = () => (
               <Route path="/quick-actions/add-weight" element={<AddWeight />} />
               <Route path="/quick-actions/log-water" element={<LogWater />} />
 
-              {/* Onboarding Routes */}
+              {/* New Comprehensive Onboarding Routes */}
+              <Route path="/onboarding/basic-info" element={<BasicInfo />} />
+              <Route
+                path="/onboarding/goal-setting"
+                element={<GoalSetting />}
+              />
+              <Route
+                path="/onboarding/activity-level"
+                element={<ActivityLevel />}
+              />
+              <Route
+                path="/onboarding/dietary-preferences"
+                element={<DietaryPreferences />}
+              />
+              <Route
+                path="/onboarding/food-preferences"
+                element={<FoodPreferences />}
+              />
+              <Route
+                path="/onboarding/tracking-preferences"
+                element={<TrackingPreferences />}
+              />
+              <Route
+                path="/onboarding/health-conditions"
+                element={<HealthConditions />}
+              />
+              <Route
+                path="/onboarding/lifestyle-motivation"
+                element={<LifestyleMotivation />}
+              />
+              <Route
+                path="/onboarding/units-preference"
+                element={<UnitsPreference />}
+              />
+              <Route
+                path="/onboarding/final-complete"
+                element={<FinalComplete />}
+              />
+
+              {/* Legacy Onboarding Routes (for fallback) */}
               <Route
                 path="/onboarding/personal-info"
                 element={<PersonalInfo />}
