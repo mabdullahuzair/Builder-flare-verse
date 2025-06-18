@@ -31,7 +31,50 @@ export default function Home() {
     return "Good evening";
   };
 
-  const userName = "Alex";
+  // Get user data from onboarding
+  const userInfo = JSON.parse(
+    localStorage.getItem("macromate_user_info") || "{}",
+  );
+  const goals = JSON.parse(localStorage.getItem("macromate_goals") || "{}");
+
+  const userName = userInfo.name?.split(" ")[0] || "there";
+
+  // Calculate target calories based on user's goals
+  const calculateTargetCalories = () => {
+    if (!userInfo.age || !userInfo.weight || !userInfo.height) return 2100;
+
+    const weight = parseFloat(userInfo.weight);
+    const age = parseInt(userInfo.age);
+    let height = parseFloat(userInfo.height);
+
+    // Convert height to cm if needed (rough conversion for demo)
+    if (userInfo.heightUnit === "ft-in") {
+      height = height * 30.48;
+    }
+
+    // Basic BMR calculation
+    const bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+    const activityMultipliers = {
+      sedentary: 1.2,
+      light: 1.375,
+      moderate: 1.55,
+      active: 1.725,
+      very_active: 1.9,
+    };
+
+    const multiplier =
+      activityMultipliers[
+        goals.activityLevel as keyof typeof activityMultipliers
+      ] || 1.55;
+    const tdee = bmr * multiplier;
+
+    // Adjust based on goal
+    if (goals.goal === "lose") return Math.round(tdee - 500);
+    if (goals.goal === "gain") return Math.round(tdee + 500);
+    return Math.round(tdee);
+  };
+
+  const targetCalories = calculateTargetCalories();
 
   return (
     <div className="min-h-screen bg-neutral-50 pb-20">
@@ -88,13 +131,13 @@ export default function Home() {
         >
           <CalorieMacroRing
             calories={1250}
-            targetCalories={2100}
+            targetCalories={targetCalories}
             protein={95}
-            targetProtein={150}
+            targetProtein={Math.round((targetCalories * 0.25) / 4)} // 25% of calories from protein
             carbs={140}
-            targetCarbs={200}
+            targetCarbs={Math.round((targetCalories * 0.45) / 4)} // 45% of calories from carbs
             fats={45}
-            targetFats={80}
+            targetFats={Math.round((targetCalories * 0.3) / 9)} // 30% of calories from fats
           />
         </motion.div>
 
