@@ -100,6 +100,8 @@ export default function Goals() {
   const [selectedActivity, setSelectedActivity] =
     useState<ActivityLevel | null>(null);
   const [targetWeight, setTargetWeight] = useState("");
+  const [timeline, setTimeline] = useState("12"); // weeks
+  const [weeklyRate, setWeeklyRate] = useState("1"); // lbs per week
 
   // Get user info from previous step
   const userInfo = JSON.parse(
@@ -107,11 +109,15 @@ export default function Goals() {
   );
 
   const handleContinue = () => {
-    if (selectedGoal && selectedActivity) {
+    if (selectedGoal && selectedActivity && targetWeight) {
       const goalsData = {
         goal: selectedGoal,
         activityLevel: selectedActivity,
-        targetWeight: targetWeight || userInfo.weight,
+        targetWeight: parseFloat(targetWeight),
+        currentWeight: parseFloat(userInfo.weight),
+        timeline: parseInt(timeline),
+        weeklyRate: parseFloat(weeklyRate),
+        weightUnit: userInfo.weightUnit,
       };
 
       localStorage.setItem("macromate_goals", JSON.stringify(goalsData));
@@ -300,8 +306,112 @@ export default function Goals() {
             </div>
           </motion.div>
 
+          {/* Specific Target Weight */}
+          {selectedGoal && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="space-y-4"
+            >
+              <h3 className="font-semibold text-text-primary">
+                {selectedGoal === "lose"
+                  ? "How much weight do you want to lose?"
+                  : selectedGoal === "gain"
+                    ? "How much weight do you want to gain?"
+                    : "What's your ideal weight?"}
+              </h3>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-text-primary">
+                    Target Weight
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      type="number"
+                      value={targetWeight}
+                      onChange={(e) => setTargetWeight(e.target.value)}
+                      placeholder={userInfo.weightUnit === "lbs" ? "150" : "68"}
+                      className="h-12 text-center font-semibold text-lg"
+                      step="0.1"
+                    />
+                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-500 text-sm">
+                      {userInfo.weightUnit}
+                    </span>
+                  </div>
+                </div>
+
+                {selectedGoal !== "maintain" && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-text-primary">
+                      Timeline
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        type="number"
+                        value={timeline}
+                        onChange={(e) => setTimeline(e.target.value)}
+                        className="h-12 text-center font-semibold text-lg"
+                        min="4"
+                        max="52"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-500 text-sm">
+                        weeks
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {selectedGoal !== "maintain" &&
+                targetWeight &&
+                userInfo.weight && (
+                  <Card className="p-4 bg-gradient-to-br from-neutral-50 to-neutral-100">
+                    <div className="space-y-3">
+                      <h4 className="font-medium text-text-primary">
+                        Goal Summary
+                      </h4>
+                      <div className="grid grid-cols-3 gap-4 text-center text-sm">
+                        <div>
+                          <div className="font-bold text-neutral-700">
+                            {Math.abs(
+                              parseFloat(targetWeight) -
+                                parseFloat(userInfo.weight),
+                            ).toFixed(1)}
+                          </div>
+                          <div className="text-neutral-600">
+                            {userInfo.weightUnit} to {selectedGoal}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="font-bold text-neutral-700">
+                            {timeline}
+                          </div>
+                          <div className="text-neutral-600">weeks</div>
+                        </div>
+                        <div>
+                          <div className="font-bold text-brand-primary">
+                            {(
+                              Math.abs(
+                                parseFloat(targetWeight) -
+                                  parseFloat(userInfo.weight),
+                              ) / parseInt(timeline)
+                            ).toFixed(1)}
+                          </div>
+                          <div className="text-neutral-600">
+                            {userInfo.weightUnit}/week
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                )}
+            </motion.div>
+          )}
+
           {/* Calculated Calories */}
-          {selectedGoal && selectedActivity && (
+          {selectedGoal && selectedActivity && targetWeight && (
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -336,7 +446,7 @@ export default function Goals() {
           >
             <Button
               onClick={handleContinue}
-              disabled={!selectedGoal || !selectedActivity}
+              disabled={!selectedGoal || !selectedActivity || !targetWeight}
               className="w-full gradient-bg text-white h-12 font-medium rounded-lg hover:shadow-lg transition-shadow disabled:opacity-50"
             >
               Continue

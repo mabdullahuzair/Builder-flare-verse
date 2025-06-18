@@ -4,6 +4,7 @@ import { CalorieMacroRing } from "@/components/dashboard/CalorieMacroRing";
 import { VitalsCards } from "@/components/dashboard/VitalsCards";
 import { TodaysDiary } from "@/components/dashboard/TodaysDiary";
 import { QuickAccess } from "@/components/dashboard/QuickAccess";
+import { BMICalculator } from "@/components/dashboard/BMICalculator";
 import { FloatingActionButton } from "@/components/ui/floating-action-button";
 import { RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
@@ -148,6 +149,15 @@ export default function Home() {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <VitalsCards />
+        </motion.div>
+
+        {/* BMI Calculator */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.25 }}
+        >
+          <BMICalculator />
         </motion.div>
 
         {/* Quick Access */}
