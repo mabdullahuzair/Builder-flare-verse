@@ -36,13 +36,24 @@ import LogWater from "./pages/quick-actions/LogWater";
 
 // Onboarding pages
 import {
+  Welcome,
+  PersonalInfoSetup,
+  BodyMetrics,
+  SelectGoal,
+  TargetWeight,
+  WeightRate,
+  ActivityLevel,
+  DietaryPreferences,
+  MacronutrientDistribution,
+  TrackingPreferences,
+  MealPreferences,
+  Notifications,
+  HealthIntegrations,
+  OnboardingSummary,
+  // Legacy pages
   BasicInfo,
   GoalSetting,
-  ActivityLevel,
-  MacronutrientDistribution,
-  DietaryPreferences,
   FoodPreferences,
-  TrackingPreferences,
   HealthConditions,
   LifestyleMotivation,
   UnitsPreference,
@@ -117,31 +128,64 @@ const App = () => (
               <Route path="/quick-actions/add-weight" element={<AddWeight />} />
               <Route path="/quick-actions/log-water" element={<LogWater />} />
 
-              {/* New Comprehensive Onboarding Routes */}
-              <Route path="/onboarding/basic-info" element={<BasicInfo />} />
+              {/* Complete 15-Screen Onboarding Flow */}
+              <Route path="/onboarding/welcome" element={<Welcome />} />
               <Route
-                path="/onboarding/goal-setting"
-                element={<GoalSetting />}
+                path="/onboarding/personal-info"
+                element={<PersonalInfoSetup />}
               />
+              <Route
+                path="/onboarding/body-metrics"
+                element={<BodyMetrics />}
+              />
+              <Route path="/onboarding/select-goal" element={<SelectGoal />} />
+              <Route
+                path="/onboarding/target-weight"
+                element={<TargetWeight />}
+              />
+              <Route path="/onboarding/weight-rate" element={<WeightRate />} />
               <Route
                 path="/onboarding/activity-level"
                 element={<ActivityLevel />}
-              />
-              <Route
-                path="/onboarding/macro-distribution"
-                element={<MacronutrientDistribution />}
               />
               <Route
                 path="/onboarding/dietary-preferences"
                 element={<DietaryPreferences />}
               />
               <Route
-                path="/onboarding/food-preferences"
-                element={<FoodPreferences />}
+                path="/onboarding/macro-distribution"
+                element={<MacronutrientDistribution />}
               />
               <Route
                 path="/onboarding/tracking-preferences"
                 element={<TrackingPreferences />}
+              />
+              <Route
+                path="/onboarding/meal-preferences"
+                element={<MealPreferences />}
+              />
+              <Route
+                path="/onboarding/notifications"
+                element={<Notifications />}
+              />
+              <Route
+                path="/onboarding/health-integrations"
+                element={<HealthIntegrations />}
+              />
+              <Route
+                path="/onboarding/summary"
+                element={<OnboardingSummary />}
+              />
+
+              {/* Legacy Onboarding Routes */}
+              <Route path="/onboarding/basic-info" element={<BasicInfo />} />
+              <Route
+                path="/onboarding/goal-setting"
+                element={<GoalSetting />}
+              />
+              <Route
+                path="/onboarding/food-preferences"
+                element={<FoodPreferences />}
               />
               <Route
                 path="/onboarding/health-conditions"

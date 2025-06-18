@@ -65,8 +65,8 @@ export default function Signup() {
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      // Navigate to comprehensive onboarding after successful signup
-      navigate("/onboarding/basic-info");
+      // Navigate to welcome screen to start comprehensive 15-screen onboarding
+      navigate("/onboarding/welcome");
     }, 1500);
   };
 
