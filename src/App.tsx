@@ -39,6 +39,7 @@ import {
   BasicInfo,
   GoalSetting,
   ActivityLevel,
+  MacronutrientDistribution,
   DietaryPreferences,
   FoodPreferences,
   TrackingPreferences,
@@ -125,6 +126,10 @@ const App = () => (
               <Route
                 path="/onboarding/activity-level"
                 element={<ActivityLevel />}
+              />
+              <Route
+                path="/onboarding/macro-distribution"
+                element={<MacronutrientDistribution />}
               />
               <Route
                 path="/onboarding/dietary-preferences"

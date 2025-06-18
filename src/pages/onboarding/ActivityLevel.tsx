@@ -109,7 +109,7 @@ export default function ActivityLevel() {
         "macromate_activity_level",
         JSON.stringify(activityData),
       );
-      navigate("/onboarding/dietary-preferences");
+      navigate("/onboarding/macro-distribution");
     }
   };
 
