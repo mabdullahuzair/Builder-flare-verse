@@ -126,8 +126,7 @@ const weightLossRates = [
     id: "aggressive" as WeightChangeRate,
     title: "Aggressive",
     description: "1 kg / 2 lbs per week",
-    subtitle:
-      "Max limit for short-term goals. Only for users with significant weight to lose",
+    subtitle: "Max limit for short-term goals. Only for users with significant weight to lose",
     warning: "Not suitable for everyone—can be hard to maintain",
     lbsPerWeek: 2,
     kgPerWeek: 1,
@@ -168,8 +167,7 @@ const weightGainRates = [
     id: "aggressive" as WeightChangeRate,
     title: "Very Aggressive",
     description: "1 kg / 2 lbs per week",
-    subtitle:
-      "Only recommended for underweight users or advanced bulking cycles",
+    subtitle: "Only recommended for underweight users or advanced bulking cycles",
     warning: "Risk of higher fat gain",
     lbsPerWeek: 2,
     kgPerWeek: 1,
@@ -381,41 +379,50 @@ export default function GoalSetting() {
               </div>
 
               <div className="space-y-3">
-                {(selectedGoal === "lose"
-                  ? weightLossRates
-                  : weightGainRates
-                ).map((rate, index) => (
-                  <motion.div
-                    key={rate.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 + index * 0.05 }}
-                  >
-                    <Card
-                      className={`p-4 cursor-pointer transition-all ${
-                        selectedRate === rate.id
-                          ? "border-brand-primary bg-brand-primary/5 border-2"
-                          : "hover:border-neutral-200 border"
-                      }`}
-                      onClick={() => setSelectedRate(rate.id)}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h5 className="font-medium text-text-primary">
-                              {rate.title}
-                            </h5>
-                            <span className="text-sm font-medium text-brand-primary">
-                              {basicInfo.weightUnit === "lbs"
-                                ? `${rate.lbsPerWeek} lbs/week`
-                                : `${rate.kgPerWeek} kg/week`}
-                            </span>
-                          </div>
-                          <p className="text-sm text-neutral-600 mb-2">
-                            {rate.subtitle}
-                          </p>
-                          {rate.warning && (
-                            <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg p-2">
+              {selectedGoal !== "maintain" && targetWeight && basicInfo.weight && selectedRate && (
+                <Card className="p-4 bg-gradient-to-br from-neutral-50 to-neutral-100">
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-text-primary">Goal Summary</h4>
+                    <div className="grid grid-cols-3 gap-4 text-center text-sm">
+                      <div>
+                        <div className="font-bold text-neutral-700">
+                          {Math.abs(parseFloat(targetWeight) - parseFloat(basicInfo.weight)).toFixed(1)}
+                        </div>
+                        <div className="text-neutral-600">
+                          {basicInfo.weightUnit} to {selectedGoal}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-bold text-brand-primary">
+                          {basicInfo.weightUnit === "lbs"
+                            ? (selectedGoal === "lose" ? weightLossRates : weightGainRates)
+                              .find(r => r.id === selectedRate)?.lbsPerWeek
+                            : (selectedGoal === "lose" ? weightLossRates : weightGainRates)
+                              .find(r => r.id === selectedRate)?.kgPerWeek
+                          }
+                        </div>
+                        <div className="text-neutral-600">
+                          {basicInfo.weightUnit}/week
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-bold text-green-600">
+                          {(
+                            Math.abs(parseFloat(targetWeight) - parseFloat(basicInfo.weight)) /
+                            (basicInfo.weightUnit === "lbs"
+                              ? (selectedGoal === "lose" ? weightLossRates : weightGainRates)
+                                .find(r => r.id === selectedRate)?.lbsPerWeek || 1
+                              : (selectedGoal === "lose" ? weightLossRates : weightGainRates)
+                                .find(r => r.id === selectedRate)?.kgPerWeek || 0.5
+                            )
+                          ).toFixed(0)}
+                        </div>
+                        <div className="text-neutral-600">weeks needed</div>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              )}
                               <span className="text-amber-600 text-xs">⚠️</span>
                               <span className="text-xs text-amber-700">
                                 {rate.warning}
@@ -443,9 +450,7 @@ export default function GoalSetting() {
                 <div className="flex items-center gap-2">
                   <span className="text-green-600">💡</span>
                   <p className="text-sm text-green-700">
-                    <strong>Recommended:</strong> We suggest aiming for 0.5–1.0{" "}
-                    {basicInfo.weightUnit}/week for healthy, sustainable
-                    progress.
+                    <strong>Recommended:</strong> We suggest aiming for 0.5–1.0 {basicInfo.weightUnit}/week for healthy, sustainable progress.
                   </p>
                 </div>
               </div>
@@ -464,10 +469,9 @@ export default function GoalSetting() {
                         Aggressive Rate Selected
                       </h4>
                       <p className="text-sm text-orange-700">
-                        This rate is harder to sustain and may not be suitable
-                        for everyone. Please consult a health professional if
-                        you're unsure. Consider starting with a moderate
-                        approach first.
+                        This rate is harder to sustain and may not be suitable for everyone.
+                        Please consult a health professional if you're unsure. Consider starting
+                        with a moderate approach first.
                       </p>
                     </div>
                   </div>
