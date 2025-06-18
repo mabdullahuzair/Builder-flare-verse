@@ -3,34 +3,62 @@ import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
 
 interface CalorieMacroRingProps {
-  calories: number;
-  targetCalories: number;
-  protein: number;
-  targetProtein: number;
-  carbs: number;
-  targetCarbs: number;
-  fats: number;
-  targetFats: number;
+  calories?: number;
+  targetCalories?: number;
+  protein?: number;
+  targetProtein?: number;
+  carbs?: number;
+  targetCarbs?: number;
+  fats?: number;
+  targetFats?: number;
 }
 
 export function CalorieMacroRing({
-  calories = 2310, // Updated to show overage
-  targetCalories = 2100,
-  protein = 95,
-  targetProtein = 150,
-  carbs = 140,
-  targetCarbs = 200,
-  fats = 45,
-  targetFats = 80,
+  calories,
+  targetCalories,
+  protein,
+  targetProtein,
+  carbs,
+  targetCarbs,
+  fats,
+  targetFats,
 }: CalorieMacroRingProps) {
   const navigate = useNavigate();
-  const caloriePercentage = Math.min((calories / targetCalories) * 100, 150); // Allow up to 150% for visualization
-  const proteinPercentage = Math.min((protein / targetProtein) * 100, 100);
-  const carbsPercentage = Math.min((carbs / targetCarbs) * 100, 100);
-  const fatsPercentage = Math.min((fats / targetFats) * 100, 100);
 
-  const isOverTarget = calories > targetCalories;
-  const isCheatMealThreshold = calories > targetCalories * 1.1; // 110% threshold
+  // Get macro distribution data from onboarding
+  const macroData = JSON.parse(
+    localStorage.getItem("macromate_macro_distribution") ||
+      '{"dailyCalories": 2200, "proteinGrams": 165, "carbGrams": 275, "fatGrams": 73}',
+  );
+
+  // Use provided props or fallback to calculated data
+  const actualTargetCalories = targetCalories || macroData.dailyCalories;
+  const actualTargetProtein = targetProtein || macroData.proteinGrams;
+  const actualTargetCarbs = targetCarbs || macroData.carbGrams;
+  const actualTargetFats = targetFats || macroData.fatGrams;
+
+  // Mock consumed data - in real app, this would come from today's food logs
+  const actualCalories = calories || 1299;
+  const actualProtein = protein || 98;
+  const actualCarbs = carbs || 122;
+  const actualFats = fats || 51;
+
+  const caloriePercentage = Math.min(
+    (actualCalories / actualTargetCalories) * 100,
+    150,
+  );
+  const proteinPercentage = Math.min(
+    (actualProtein / actualTargetProtein) * 100,
+    100,
+  );
+  const carbsPercentage = Math.min(
+    (actualCarbs / actualTargetCarbs) * 100,
+    100,
+  );
+  const fatsPercentage = Math.min((actualFats / actualTargetFats) * 100, 100);
+
+  const isOverTarget = actualCalories > actualTargetCalories;
+  const isCheatMealThreshold = actualCalories > actualTargetCalories * 1.1; // 110% threshold
 
   const circumference = 2 * Math.PI * 45; // radius = 45
   const offset =
@@ -48,195 +76,186 @@ export function CalorieMacroRing({
         <h3 className="text-lg font-semibold text-text-primary">
           Today's Goal
         </h3>
-        <div className="flex items-center gap-2">
+        <div className="text-sm">
+          {Math.round(caloriePercentage)}%
           {isCheatMealThreshold && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="flex items-center gap-1"
-            >
-              <AlertTriangle size={16} className="text-warning" />
-              <span className="text-xs text-warning font-medium">
-                Cheat Meal
-              </span>
-            </motion.div>
+            <AlertTriangle
+              size={16}
+              className="inline ml-1 text-warning animate-pulse"
+            />
           )}
-          <span
-            className={`text-sm ${isOverTarget ? "text-warning" : "text-neutral-500"}`}
-          >
-            {Math.round(caloriePercentage)}%
-          </span>
         </div>
       </div>
 
-      <div className="flex items-center justify-center relative">
-        {/* Main Calorie Ring */}
-        <div
-          className={`relative w-32 h-32 ${isCheatMealThreshold ? "cursor-pointer" : ""}`}
+      <div className="relative mb-6">
+        {/* Main Ring */}
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="relative flex items-center justify-center"
+          style={{ cursor: isCheatMealThreshold ? "pointer" : "default" }}
           onClick={handleRingClick}
         >
-          <svg
-            className="w-full h-full transform -rotate-90"
-            viewBox="0 0 100 100"
-          >
+          <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 100 100">
             {/* Background circle */}
             <circle
               cx="50"
               cy="50"
               r="45"
-              stroke="#F1F5F9"
-              strokeWidth="8"
               fill="none"
+              stroke="#f3f4f6"
+              strokeWidth="6"
             />
-
-            {/* Progress circle with gradient or warning color */}
-            <defs>
-              <linearGradient
-                id={isOverTarget ? "warningGradient" : "calorieGradient"}
-                x1="0%"
-                y1="0%"
-                x2="100%"
-                y2="0%"
-              >
-                {isOverTarget ? (
-                  <>
-                    <stop offset="0%" stopColor="#FFB259" />
-                    <stop offset="100%" stopColor="#FF8A65" />
-                  </>
-                ) : (
-                  <>
-                    <stop offset="0%" stopColor="#2FA4FF" />
-                    <stop offset="100%" stopColor="#36C9B0" />
-                  </>
-                )}
-              </linearGradient>
-            </defs>
-
+            {/* Progress circle */}
             <motion.circle
               cx="50"
               cy="50"
               r="45"
-              stroke={`url(#${isOverTarget ? "warningGradient" : "calorieGradient"})`}
-              strokeWidth="8"
               fill="none"
+              stroke={
+                isOverTarget
+                  ? isCheatMealThreshold
+                    ? "#f59e0b"
+                    : "#ef4444"
+                  : "url(#gradient)"
+              }
+              strokeWidth="6"
               strokeLinecap="round"
               strokeDasharray={circumference}
+              strokeDashoffset={offset}
               initial={{ strokeDashoffset: circumference }}
               animate={{ strokeDashoffset: offset }}
-              transition={{ duration: 1, ease: "easeOut" }}
+              transition={{ duration: 1, ease: "easeInOut" }}
             />
-
-            {/* Overage indicator */}
-            {isOverTarget && (
-              <motion.circle
-                cx="50"
-                cy="50"
-                r="45"
-                stroke="#FF6B6B"
-                strokeWidth="4"
-                fill="none"
-                strokeLinecap="round"
-                strokeDasharray={`${((caloriePercentage - 100) / 100) * circumference} ${circumference}`}
-                strokeDashoffset={-offset}
-                initial={{ strokeDasharray: `0 ${circumference}` }}
-                animate={{
-                  strokeDasharray: `${(Math.max(0, caloriePercentage - 100) / 100) * circumference} ${circumference}`,
-                }}
-                transition={{ duration: 1, ease: "easeOut", delay: 0.5 }}
-                opacity={0.7}
-              />
-            )}
+            <defs>
+              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#36C9B0" />
+                <stop offset="100%" stopColor="#2FA4FF" />
+              </linearGradient>
+            </defs>
           </svg>
 
           {/* Center content */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span
-              className={`text-2xl font-bold ${isOverTarget ? "text-warning" : "text-text-primary"}`}
-            >
-              {calories.toLocaleString()}
-            </span>
-            <span className="text-xs text-neutral-500">
-              of {targetCalories.toLocaleString()}
-            </span>
-            <span className="text-xs font-medium text-neutral-600 mt-1">
-              calories
-            </span>
-          </div>
-
-          {/* Cheat meal indicator */}
-          {isCheatMealThreshold && (
             <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 1, type: "spring" }}
-              className="absolute -bottom-2 -right-2 w-6 h-6 bg-warning rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.5, type: "spring" }}
+              className="text-center"
             >
-              <AlertTriangle size={12} className="text-white" />
+              <div className="text-2xl font-bold text-text-primary">
+                {actualCalories.toLocaleString()}
+              </div>
+              <div className="text-xs text-neutral-500">
+                of {actualTargetCalories.toLocaleString()}
+              </div>
             </motion.div>
-          )}
-        </div>
+          </div>
+        </motion.div>
+
+        {/* Overage Warning */}
+        {isCheatMealThreshold && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-warning text-white text-xs px-2 py-1 rounded-full whitespace-nowrap"
+          >
+            Tap for Cheat Meal Balance
+          </motion.div>
+        )}
       </div>
 
-      {/* Overage warning */}
-      {isCheatMealThreshold && (
+      {/* Macros breakdown */}
+      <div className="space-y-3">
+        {/* Protein */}
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2 }}
-          className="mt-4 p-3 bg-warning/10 border border-warning/20 rounded-lg cursor-pointer hover:bg-warning/15 transition-colors"
-          onClick={handleRingClick}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.6 }}
+          className="flex items-center justify-between"
         >
-          <div className="flex items-center gap-2 text-warning">
-            <AlertTriangle size={16} />
-            <span className="text-sm font-medium">
-              Tap to balance tomorrow's calories
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <span className="text-sm font-medium text-neutral-700">
+              Protein
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-16 bg-neutral-200 rounded-full h-1.5">
+              <motion.div
+                className="h-1.5 bg-red-500 rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${proteinPercentage}%` }}
+                transition={{ delay: 0.8, duration: 0.5 }}
+              />
+            </div>
+            <span className="text-xs font-medium text-neutral-600 w-12 text-right">
+              {actualProtein}g/{actualTargetProtein}g
             </span>
           </div>
         </motion.div>
-      )}
 
-      {/* Macro breakdown */}
-      <div className="grid grid-cols-3 gap-4 mt-6">
-        <div className="text-center">
-          <div className="w-full bg-neutral-100 rounded-full h-2 mb-2">
-            <motion.div
-              className="bg-success h-2 rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${proteinPercentage}%` }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            />
+        {/* Carbs */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.7 }}
+          className="flex items-center justify-between"
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+            <span className="text-sm font-medium text-neutral-700">Carbs</span>
           </div>
-          <div className="text-sm font-medium text-text-primary">
-            {protein}g
+          <div className="flex items-center gap-2">
+            <div className="w-16 bg-neutral-200 rounded-full h-1.5">
+              <motion.div
+                className="h-1.5 bg-blue-500 rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${carbsPercentage}%` }}
+                transition={{ delay: 0.9, duration: 0.5 }}
+              />
+            </div>
+            <span className="text-xs font-medium text-neutral-600 w-12 text-right">
+              {actualCarbs}g/{actualTargetCarbs}g
+            </span>
           </div>
-          <div className="text-xs text-neutral-500">Protein</div>
-        </div>
+        </motion.div>
 
-        <div className="text-center">
-          <div className="w-full bg-neutral-100 rounded-full h-2 mb-2">
-            <motion.div
-              className="bg-warning h-2 rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${carbsPercentage}%` }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-            />
+        {/* Fats */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.8 }}
+          className="flex items-center justify-between"
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
+            <span className="text-sm font-medium text-neutral-700">Fat</span>
           </div>
-          <div className="text-sm font-medium text-text-primary">{carbs}g</div>
-          <div className="text-xs text-neutral-500">Carbs</div>
-        </div>
+          <div className="flex items-center gap-2">
+            <div className="w-16 bg-neutral-200 rounded-full h-1.5">
+              <motion.div
+                className="h-1.5 bg-amber-500 rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${fatsPercentage}%` }}
+                transition={{ delay: 1.0, duration: 0.5 }}
+              />
+            </div>
+            <span className="text-xs font-medium text-neutral-600 w-12 text-right">
+              {actualFats}g/{actualTargetFats}g
+            </span>
+          </div>
+        </motion.div>
+      </div>
 
-        <div className="text-center">
-          <div className="w-full bg-neutral-100 rounded-full h-2 mb-2">
-            <motion.div
-              className="bg-brand-primary h-2 rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${fatsPercentage}%` }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            />
-          </div>
-          <div className="text-sm font-medium text-text-primary">{fats}g</div>
-          <div className="text-xs text-neutral-500">Fats</div>
-        </div>
+      {/* Quick tip */}
+      <div className="mt-4 text-xs text-neutral-500 text-center">
+        {caloriePercentage < 80
+          ? "Great progress! Keep logging your meals."
+          : caloriePercentage < 110
+            ? "You're on track for today's goal!"
+            : "Consider the Cheat Meal Balancer for tomorrow."}
       </div>
     </div>
   );

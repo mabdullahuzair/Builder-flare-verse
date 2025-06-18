@@ -295,22 +295,28 @@ export default function FinalComplete() {
                 </div>
                 <div className="grid grid-cols-3 gap-4 text-xs">
                   <div className="text-center">
-                    <div className="font-semibold text-text-primary">
-                      {Math.round(dailyCalories * 0.5)}
+                    <div className="font-semibold text-red-600">
+                      {macroDistribution.proteinGrams}g
                     </div>
-                    <div className="text-neutral-600">Protein (30%)</div>
+                    <div className="text-neutral-600">
+                      Protein ({macroDistribution.proteinPercent || 20}%)
+                    </div>
                   </div>
                   <div className="text-center">
-                    <div className="font-semibold text-text-primary">
-                      {Math.round(dailyCalories * 0.3)}
+                    <div className="font-semibold text-blue-600">
+                      {macroDistribution.carbGrams}g
                     </div>
-                    <div className="text-neutral-600">Carbs (40%)</div>
+                    <div className="text-neutral-600">
+                      Carbs ({macroDistribution.carbsPercent || 50}%)
+                    </div>
                   </div>
                   <div className="text-center">
-                    <div className="font-semibold text-text-primary">
-                      {Math.round(dailyCalories * 0.2)}
+                    <div className="font-semibold text-orange-600">
+                      {macroDistribution.fatGrams}g
                     </div>
-                    <div className="text-neutral-600">Fats (30%)</div>
+                    <div className="text-neutral-600">
+                      Fats ({macroDistribution.fatPercent || 30}%)
+                    </div>
                   </div>
                 </div>
               </div>
