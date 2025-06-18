@@ -1,239 +1,248 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { BottomNavigation } from "@/components/navigation/BottomNavigation";
+interface PersonalInfo {
+  age: number;
+  weight: number;
+  height: string;
+  gender: string;
+  weightUnit: string;
+  heightUnit: string;
+}
 
-// Main app pages
-import Home from "./pages/Home";
-import Log from "./pages/Log";
-import Workout from "./pages/Workout";
-import Progress from "./pages/Progress";
-import Profile from "./pages/Profile";
-import CheatMealBalance from "./pages/CheatMealBalance";
-import NotFound from "./pages/NotFound";
+interface GoalData {
+  primaryGoal: string; // e.g., "lose", "gain", "maintain"
+  calorieAdjustment?: number | null; // Optional adjustment in calories
+  weightChangeRate?: string; // e.g., "0.5", "1", "1.5", "2" (lbs/week) - Note: This field is not used in the current code but is in the interface.
+}
 
-// Authentication pages
-import Login from "./pages/auth/Login";
-import Signup from "./pages/auth/Signup";
-import ForgotPassword from "./pages/auth/ForgotPassword";
-import VerifyEmail from "./pages/auth/VerifyEmail";
+interface ActivityData {
+  activityMultiplier: number | null; // Use nullish coalescing ??
+}
 
-// Profile pages
-import ProfileOverview from "./pages/profile/ProfileOverview";
-import Preferences from "./pages/profile/Preferences";
-import ConnectedApps from "./pages/profile/ConnectedApps";
-import SecurityPrivacy from "./pages/profile/SecurityPrivacy";
-import Subscription from "./pages/profile/Subscription";
-import AboutLegal from "./pages/profile/AboutLegal";
+/**
+ * Calculate BMR using Mifflin-St Jeor equation
+ * More accurate than Harris-Benedict for modern populations
+ */
+export function calculateBMR(personalInfo: PersonalInfo): number {
+  // Basic check for essential missing data.
+  // Note: age/weight 0 are treated as missing here, height "" is missing.
+  if (!personalInfo.age || !personalInfo.weight || !personalInfo.height) {
+    return 0;
+  }
 
-// Quick Action pages
-import SnapMeal from "./pages/quick-actions/SnapMeal";
-import ManualMeal from "./pages/quick-actions/ManualMeal";
-import AddWeight from "./pages/quick-actions/AddWeight";
-import LogWater from "./pages/quick-actions/LogWater";
+  // Use parseFloat directly on the value (handles numbers and strings) and add || 0 for robustness
+  let weightInKg = parseFloat(personalInfo.weight as any) || 0; // Use `as any` or update interface if strings are common
+  let heightInCm = 0;
+  // Use parseInt directly on the value (handles numbers and strings) and add || 0
+  const age = parseInt(personalInfo.age as any) || 0; // Use `as any` or update interface if strings are common
+  const isMale = personalInfo.gender?.toLowerCase() === "male"; // Added toLowerCase for case-insensitivity
 
-// Onboarding pages
-import {
-  Welcome,
-  PersonalInfoSetup,
-  BodyMetrics,
-  SelectGoal,
-  TargetWeight,
-  WeightRate,
-  ActivityLevel,
-  DietaryPreferences,
-  MacronutrientDistribution,
-  TrackingPreferences,
-  MealPreferences,
-  Notifications,
-  HealthIntegrations,
-  OnboardingSummary,
-  // Legacy pages
-  BasicInfo,
-  GoalSetting,
-  FoodPreferences,
-  HealthConditions,
-  LifestyleMotivation,
-  UnitsPreference,
-  FinalComplete,
-  PersonalInfo,
-  Goals,
-  Permissions,
-  Complete,
-} from "./pages/onboarding";
+  // If any core value ended up as 0 after parsing, return 0
+  if (weightInKg === 0 || age === 0) {
+    return 0;
+  }
 
-// Guards
-import { OnboardingGuard } from "./components/OnboardingGuard";
+  // Convert weight to kg if needed
+  if (personalInfo.weightUnit?.toLowerCase() === "lbs") { // Added toLowerCase
+    weightInKg = weightInKg / 2.20462; // More precise conversion
+  }
 
-// Splash
-import Splash from "./pages/Splash";
+  // Convert height to cm
+  if (personalInfo.heightUnit?.toLowerCase() === "ft-in") { // Added toLowerCase
+    let totalInches = 0;
+    const heightStr = personalInfo.height.trim(); // Trim whitespace
 
-const queryClient = new QueryClient();
+    if (heightStr.includes("'")) {
+      // Handles X'Y" format
+      const parts = heightStr.split("'");
+      const feet = parseFloat(parts[0]) || 0;
+      const inchesPart = parts[1]?.replace('"', "").trim() || "0"; // Handle missing inch part, trim
+      const inches = parseFloat(inchesPart) || 0;
+      totalInches = feet * 12 + inches;
+    } else {
+      // Handles inputs like "5" (assuming feet) or "60" (assuming inches)
+      // This is ambiguous, assuming a single number with ft-in unit means feet is common.
+      // If the user enters just "70" with ft-in selected, it's likely intended as inches.
+      // Let's assume if no ' symbol is present, it's either just feet or just inches.
+      // A simple parseFloat and then checking range or context is hard.
+      // Let's stick to assuming if no ' is present, it's just feet for simplicity as per the original logic intent, but acknowledge ambiguity.
+      const feet = parseFloat(heightStr) || 0; // Assume input like "5" means 5 feet
+      totalInches = feet * 12; // Convert feet to inches
+    }
+    heightInCm = totalInches * 2.54; // Convert total inches to cm
 
-// MacroMate App - Force refresh to fix blank screen issue
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <OnboardingGuard>
-          <div className="min-h-screen bg-neutral-50">
-            <Routes>
-              {/* Splash Screen */}
-              <Route path="/splash" element={<Splash />} />
+  } else {
+    // Assume height is in cm (or raw number is in cm)
+    heightInCm = parseFloat(personalInfo.height) || 0;
+  }
 
-              {/* Main App Routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/log" element={<Log />} />
-              <Route path="/workout" element={<Workout />} />
-              <Route path="/progress" element={<Progress />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route
-                path="/cheat-meal-balance"
-                element={<CheatMealBalance />}
-              />
+  // If height ended up as 0 after parsing, return 0 (prevents calculation issues)
+  if (heightInCm === 0) {
+    return 0;
+  }
 
-              {/* Authentication Routes */}
-              <Route path="/auth/login" element={<Login />} />
-              <Route path="/auth/signup" element={<Signup />} />
-              <Route
-                path="/auth/forgot-password"
-                element={<ForgotPassword />}
-              />
-              <Route path="/auth/verify-email" element={<VerifyEmail />} />
 
-              {/* Profile Sub-routes */}
-              <Route path="/profile/overview" element={<ProfileOverview />} />
-              <Route path="/profile/preferences" element={<Preferences />} />
-              <Route
-                path="/profile/connected-apps"
-                element={<ConnectedApps />}
-              />
-              <Route
-                path="/profile/security-privacy"
-                element={<SecurityPrivacy />}
-              />
-              <Route path="/profile/subscription" element={<Subscription />} />
-              <Route path="/profile/about-legal" element={<AboutLegal />} />
+  // Mifflin-St Jeor BMR calculation
+  let bmr = 10 * weightInKg + 6.25 * heightInCm - 5 * age;
 
-              {/* Quick Action Routes */}
-              <Route path="/quick-actions/snap-meal" element={<SnapMeal />} />
-              <Route
-                path="/quick-actions/manual-meal"
-                element={<ManualMeal />}
-              />
-              <Route path="/quick-actions/add-weight" element={<AddWeight />} />
-              <Route path="/quick-actions/log-water" element={<LogWater />} />
+  if (isMale) {
+    bmr += 5;
+  } else {
+    bmr -= 161;
+  }
 
-              {/* Complete 15-Screen Onboarding Flow */}
-              <Route path="/onboarding/welcome" element={<Welcome />} />
-              <Route
-                path="/onboarding/personal-info"
-                element={<PersonalInfoSetup />}
-              />
-              <Route
-                path="/onboarding/body-metrics"
-                element={<BodyMetrics />}
-              />
-              <Route path="/onboarding/select-goal" element={<SelectGoal />} />
-              <Route
-                path="/onboarding/target-weight"
-                element={<TargetWeight />}
-              />
-              <Route path="/onboarding/weight-rate" element={<WeightRate />} />
-              <Route
-                path="/onboarding/activity-level"
-                element={<ActivityLevel />}
-              />
-              <Route
-                path="/onboarding/dietary-preferences"
-                element={<DietaryPreferences />}
-              />
-              <Route
-                path="/onboarding/macro-distribution"
-                element={<MacronutrientDistribution />}
-              />
-              <Route
-                path="/onboarding/tracking-preferences"
-                element={<TrackingPreferences />}
-              />
-              <Route
-                path="/onboarding/meal-preferences"
-                element={<MealPreferences />}
-              />
-              <Route
-                path="/onboarding/notifications"
-                element={<Notifications />}
-              />
-              <Route
-                path="/onboarding/health-integrations"
-                element={<HealthIntegrations />}
-              />
-              <Route
-                path="/onboarding/summary"
-                element={<OnboardingSummary />}
-              />
+  return Math.round(bmr);
+}
 
-              {/* Legacy Onboarding Routes */}
-              <Route path="/onboarding/basic-info" element={<BasicInfo />} />
-              <Route
-                path="/onboarding/goal-setting"
-                element={<GoalSetting />}
-              />
-              <Route
-                path="/onboarding/food-preferences"
-                element={<FoodPreferences />}
-              />
-              <Route
-                path="/onboarding/health-conditions"
-                element={<HealthConditions />}
-              />
-              <Route
-                path="/onboarding/lifestyle-motivation"
-                element={<LifestyleMotivation />}
-              />
-              <Route
-                path="/onboarding/units-preference"
-                element={<UnitsPreference />}
-              />
-              <Route
-                path="/onboarding/final-complete"
-                element={<FinalComplete />}
-              />
+/**
+ * Calculate TDEE (Total Daily Energy Expenditure)
+ * BMR * activity multiplier
+ */
+export function calculateTDEE(
+  personalInfo: PersonalInfo,
+  activityData: ActivityData,
+): number {
+  const bmr = calculateBMR(personalInfo);
+  // Use nullish coalescing ?? to default only if null or undefined
+  const activityMultiplier = activityData.activityMultiplier ?? 1.2;
 
-              {/* Legacy Onboarding Routes (for fallback) */}
-              <Route
-                path="/onboarding/personal-info"
-                element={<PersonalInfo />}
-              />
-              <Route path="/onboarding/goals" element={<Goals />} />
-              <Route path="/onboarding/permissions" element={<Permissions />} />
-              <Route path="/onboarding/complete" element={<Complete />} />
+  // If BMR is 0 (due to invalid input), TDEE is 0
+  if (bmr === 0) {
+    return 0;
+  }
 
-              {/* Catch-all route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+  return Math.round(bmr * activityMultiplier);
+}
 
-            {/* Only show bottom navigation on main app routes */}
-            <Routes>
-              <Route path="/" element={<BottomNavigation />} />
-              <Route path="/log" element={<BottomNavigation />} />
-              <Route path="/workout" element={<BottomNavigation />} />
-              <Route path="/progress" element={<BottomNavigation />} />
-              <Route path="/profile" element={<BottomNavigation />} />
-              <Route
-                path="/cheat-meal-balance"
-                element={<BottomNavigation />}
-              />
-            </Routes>
-          </div>
-        </OnboardingGuard>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+/**
+ * Calculate daily calorie goal based on goals
+ * Applies deficit/surplus based on weight change goals
+ */
+export function calculateDailyCalories(
+  personalInfo: PersonalInfo,
+  goalData: GoalData,
+  activityData: ActivityData,
+): number {
+  let tdee = calculateTDEE(personalInfo, activityData);
 
-export default App;
+  // If TDEE is 0 (due to invalid input), daily calories is 0 before minimum floor
+  if (tdee === 0) {
+    return 0; // Apply min floor later
+  }
+
+  // Apply goal-based calorie adjustment
+  // Check if calorieAdjustment is explicitly provided (not undefined or null)
+  if (goalData.calorieAdjustment !== undefined && goalData.calorieAdjustment !== null) {
+    // Only apply adjustment if goal is lose or gain
+    if (goalData.primaryGoal?.toLowerCase() === "lose") { // Added toLowerCase
+      tdee -= goalData.calorieAdjustment;
+    } else if (goalData.primaryGoal?.toLowerCase() === "gain") { // Added toLowerCase
+      tdee += goalData.calorieAdjustment;
+    }
+    // If goal is "maintain" or other, and adjustment is provided (e.g., 0), TDEE is used directly.
+  } else {
+    // Fallback: If no explicit adjustment is provided, use default 500 kcal based on goal
+    if (goalData.primaryGoal?.toLowerCase() === "lose") { // Added toLowerCase
+      tdee -= 500; // Default 1 lb/week deficit (approx)
+    } else if (goalData.primaryGoal?.toLowerCase() === "gain") { // Added toLowerCase
+      tdee += 500; // Default 1 lb/week surplus (approx)
+    }
+    // If goal is "maintain" and no adjustment is provided, TDEE is used directly.
+  }
+
+  // Ensure a minimum calorie intake (e.g., 1200 is common recommendation)
+  // Apply rounding after applying the floor
+  return Math.round(Math.max(tdee, 1200));
+}
+
+/**
+ * Calculate BMI
+ */
+export function calculateBMI(personalInfo: PersonalInfo): number {
+  // Basic check for essential missing data
+  if (!personalInfo.weight || !personalInfo.height) return 0;
+
+  // Use parseFloat directly on the value (handles numbers and strings) and add || 0 for robustness
+  let weightInKg = parseFloat(personalInfo.weight as any) || 0; // Use `as any` or update interface if strings are common
+  let heightInM = 0;
+
+  // If weight ended up as 0 after parsing, return 0
+  if (weightInKg === 0) {
+    return 0;
+  }
+
+
+  // Convert weight to kg if needed
+  if (personalInfo.weightUnit?.toLowerCase() === "lbs") { // Added toLowerCase
+    weightInKg = weightInKg / 2.20462; // More precise conversion
+  }
+
+  // Convert height to meters
+  if (personalInfo.heightUnit?.toLowerCase() === "ft-in") { // Added toLowerCase
+    let totalInches = 0;
+    const heightStr = personalInfo.height.trim(); // Trim whitespace
+
+    if (heightStr.includes("'")) {
+      // Handles X'Y" format
+      const parts = heightStr.split("'");
+      const feet = parseFloat(parts[0]) || 0;
+      const inchesPart = parts[1]?.replace('"', "").trim() || "0"; // Handle missing inch part, trim
+      const inches = parseFloat(inchesPart) || 0;
+      totalInches = feet * 12 + inches;
+    } else {
+      // Handles inputs like "5" (assuming feet) or "70" (assuming inches).
+      // Sticking to assuming feet if no ' as per the BMR logic.
+      const feet = parseFloat(heightStr) || 0; // Assume input like "5" means 5 feet
+      totalInches = feet * 12; // Convert feet to inches
+    }
+    heightInM = totalInches * 0.0254; // Convert total inches to meters
+
+  } else {
+    // Assume height is in cm and convert to meters
+    heightInM = (parseFloat(personalInfo.height) || 0) / 100;
+  }
+
+  // Prevent division by zero if height is 0 after conversion
+  if (heightInM === 0) return 0;
+
+  // Calculate BMI
+  // Return rounded BMI, typically to 1 decimal place
+  return Math.round((weightInKg / (heightInM * heightInM)) * 10) / 10; // Rounded to 1 decimal place
+}
+
+/**
+ * Get BMI category
+ */
+export function getBMICategory(bmi: number) {
+  // Handle non-positive BMI values gracefully
+  if (bmi <= 0) return { label: "N/A", color: "text-gray-600" }; // Or some other indicator
+
+  if (bmi < 18.5) return { label: "Underweight", color: "text-blue-600" };
+  if (bmi < 25) return { label: "Normal", color: "text-green-600" };
+  if (bmi < 30) return { label: "Overweight", color: "text-orange-600" };
+  return { label: "Obese", color: "text-red-600" };
+}
+
+/**
+ * Calculate macros in grams based on calories and percentages
+ * proteinPercent, carbsPercent, fatPercent should ideally add up to 100
+ */
+export function calculateMacroGrams(
+  calories: number,
+  proteinPercent: number,
+  carbsPercent: number,
+  fatPercent: number,
+) {
+  // Ensure calories is not negative
+  const safeCalories = Math.max(0, calories);
+
+  // Defensive check: Ensure percentages are non-negative
+  const safeProteinPercent = Math.max(0, proteinPercent);
+  const safeCarbsPercent = Math.max(0, carbsPercent);
+  const safeFatPercent = Math.max(0, fatPercent);
+
+
+  const proteinGrams = Math.round((safeCalories * (safeProteinPercent / 100)) / 4);
+  const carbGrams = Math.round((safeCalories * (safeCarbsPercent / 100)) / 4);
+  const fatGrams = Math.round((safeCalories * (safeFatPercent / 100)) / 9);
+
+  return { proteinGrams, carbGrams, fatGrams };
+}
