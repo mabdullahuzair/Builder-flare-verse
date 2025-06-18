@@ -24,7 +24,7 @@ type PrimaryGoal =
   | "fitness"
   | "healthy"
   | "muscle";
-type WeightChangeRate = "slow" | "moderate" | "aggressive" | "custom";
+type WeightChangeRate = "slow" | "moderate" | "faster" | "aggressive";
 
 interface GoalOption {
   id: PrimaryGoal;
@@ -93,38 +93,87 @@ const goalOptions: GoalOption[] = [
   },
 ];
 
-const weightChangeRates = [
+// Weight Loss Rate Options
+const weightLossRates = [
   {
     id: "slow" as WeightChangeRate,
-    title: "Slow",
+    title: "Slow & Steady",
     description: "0.25 kg / 0.5 lbs per week",
-    subtitle: "Gentle, sustainable progress",
+    subtitle: "Best for sustainable, long-term fat loss",
     lbsPerWeek: 0.5,
     kgPerWeek: 0.25,
+    calorieDeficit: 250,
   },
   {
     id: "moderate" as WeightChangeRate,
     title: "Moderate",
     description: "0.5 kg / 1 lb per week",
-    subtitle: "Balanced approach",
+    subtitle: "A balanced approach—popular and safe for most users",
     lbsPerWeek: 1,
     kgPerWeek: 0.5,
+    calorieDeficit: 500,
+  },
+  {
+    id: "faster" as WeightChangeRate,
+    title: "Faster",
+    description: "0.75 kg / 1.5 lbs per week",
+    subtitle: "Still within healthy limits but requires higher discipline",
+    lbsPerWeek: 1.5,
+    kgPerWeek: 0.75,
+    calorieDeficit: 750,
   },
   {
     id: "aggressive" as WeightChangeRate,
     title: "Aggressive",
     description: "1 kg / 2 lbs per week",
-    subtitle: "Faster results, requires dedication",
+    subtitle:
+      "Max limit for short-term goals. Only for users with significant weight to lose",
+    warning: "Not suitable for everyone—can be hard to maintain",
     lbsPerWeek: 2,
     kgPerWeek: 1,
+    calorieDeficit: 1000,
+  },
+];
+
+// Weight Gain Rate Options
+const weightGainRates = [
+  {
+    id: "slow" as WeightChangeRate,
+    title: "Slow",
+    description: "0.25 kg / 0.5 lbs per week",
+    subtitle: "Ideal for lean muscle gain with minimal fat",
+    lbsPerWeek: 0.5,
+    kgPerWeek: 0.25,
+    calorieSurplus: 250,
   },
   {
-    id: "custom" as WeightChangeRate,
-    title: "Custom",
-    description: "Set your own rate",
-    subtitle: "Personalized pace",
-    lbsPerWeek: 0,
-    kgPerWeek: 0,
+    id: "moderate" as WeightChangeRate,
+    title: "Moderate",
+    description: "0.5 kg / 1 lb per week",
+    subtitle: "Common rate for general bulking",
+    lbsPerWeek: 1,
+    kgPerWeek: 0.5,
+    calorieSurplus: 500,
+  },
+  {
+    id: "faster" as WeightChangeRate,
+    title: "Aggressive",
+    description: "0.75 kg / 1.5 lbs per week",
+    subtitle: "May lead to faster gains but can include fat mass",
+    lbsPerWeek: 1.5,
+    kgPerWeek: 0.75,
+    calorieSurplus: 750,
+  },
+  {
+    id: "aggressive" as WeightChangeRate,
+    title: "Very Aggressive",
+    description: "1 kg / 2 lbs per week",
+    subtitle:
+      "Only recommended for underweight users or advanced bulking cycles",
+    warning: "Risk of higher fat gain",
+    lbsPerWeek: 2,
+    kgPerWeek: 1,
+    calorieSurplus: 1000,
   },
 ];
 
@@ -135,7 +184,6 @@ export default function GoalSetting() {
   const [selectedRate, setSelectedRate] = useState<WeightChangeRate | null>(
     null,
   );
-  const [customRate, setCustomRate] = useState("");
 
   // Get basic info from previous step
   const basicInfo = JSON.parse(
@@ -148,7 +196,6 @@ export default function GoalSetting() {
         primaryGoal: selectedGoal,
         targetWeight: targetWeight ? parseFloat(targetWeight) : null,
         weightChangeRate: selectedRate,
-        customWeightChangeRate: customRate ? parseFloat(customRate) : null,
         currentWeight: parseFloat(basicInfo.weight),
         weightUnit: basicInfo.weightUnit,
       };
@@ -165,7 +212,6 @@ export default function GoalSetting() {
     if (!selectedGoal) return false;
     if (needsTargetWeight && !targetWeight) return false;
     if (needsRate && !selectedRate) return false;
-    if (selectedRate === "custom" && !customRate) return false;
     return true;
   };
 
