@@ -37,7 +37,7 @@ export function calculateBMR(personalInfo: PersonalInfo): number {
 
   // If any core value ended up as 0 after parsing, return 0
   if (weightInKg === 0 || age === 0) {
-    return 0;
+      return 0;
   }
 
   // Convert weight to kg if needed
@@ -75,9 +75,9 @@ export function calculateBMR(personalInfo: PersonalInfo): number {
   }
 
   // If height ended up as 0 after parsing, return 0 (prevents calculation issues)
-  if (heightInCm === 0) {
-    return 0;
-  }
+   if (heightInCm === 0) {
+       return 0;
+   }
 
 
   // Mifflin-St Jeor BMR calculation
@@ -106,7 +106,7 @@ export function calculateTDEE(
 
   // If BMR is 0 (due to invalid input), TDEE is 0
   if (bmr === 0) {
-    return 0;
+      return 0;
   }
 
   return Math.round(bmr * activityMultiplier);
@@ -125,19 +125,19 @@ export function calculateDailyCalories(
 
   // If TDEE is 0 (due to invalid input), daily calories is 0 before minimum floor
   if (tdee === 0) {
-    return 0; // Apply min floor later
+      return 0; // Apply min floor later
   }
 
   // Apply goal-based calorie adjustment
   // Check if calorieAdjustment is explicitly provided (not undefined or null)
   if (goalData.calorieAdjustment !== undefined && goalData.calorieAdjustment !== null) {
-    // Only apply adjustment if goal is lose or gain
+      // Only apply adjustment if goal is lose or gain
     if (goalData.primaryGoal?.toLowerCase() === "lose") { // Added toLowerCase
       tdee -= goalData.calorieAdjustment;
     } else if (goalData.primaryGoal?.toLowerCase() === "gain") { // Added toLowerCase
       tdee += goalData.calorieAdjustment;
     }
-    // If goal is "maintain" or other, and adjustment is provided (e.g., 0), TDEE is used directly.
+     // If goal is "maintain" or other, and adjustment is provided (e.g., 0), TDEE is used directly.
   } else {
     // Fallback: If no explicit adjustment is provided, use default 500 kcal based on goal
     if (goalData.primaryGoal?.toLowerCase() === "lose") { // Added toLowerCase
@@ -164,10 +164,10 @@ export function calculateBMI(personalInfo: PersonalInfo): number {
   let weightInKg = parseFloat(personalInfo.weight as any) || 0; // Use `as any` or update interface if strings are common
   let heightInM = 0;
 
-  // If weight ended up as 0 after parsing, return 0
-  if (weightInKg === 0) {
-    return 0;
-  }
+   // If weight ended up as 0 after parsing, return 0
+   if (weightInKg === 0) {
+       return 0;
+   }
 
 
   // Convert weight to kg if needed
@@ -180,18 +180,18 @@ export function calculateBMI(personalInfo: PersonalInfo): number {
     let totalInches = 0;
     const heightStr = personalInfo.height.trim(); // Trim whitespace
 
-    if (heightStr.includes("'")) {
-      // Handles X'Y" format
-      const parts = heightStr.split("'");
-      const feet = parseFloat(parts[0]) || 0;
-      const inchesPart = parts[1]?.replace('"', "").trim() || "0"; // Handle missing inch part, trim
-      const inches = parseFloat(inchesPart) || 0;
-      totalInches = feet * 12 + inches;
+     if (heightStr.includes("'")) {
+        // Handles X'Y" format
+        const parts = heightStr.split("'");
+        const feet = parseFloat(parts[0]) || 0;
+        const inchesPart = parts[1]?.replace('"', "").trim() || "0"; // Handle missing inch part, trim
+        const inches = parseFloat(inchesPart) || 0;
+        totalInches = feet * 12 + inches;
     } else {
-      // Handles inputs like "5" (assuming feet) or "70" (assuming inches).
-      // Sticking to assuming feet if no ' as per the BMR logic.
-      const feet = parseFloat(heightStr) || 0; // Assume input like "5" means 5 feet
-      totalInches = feet * 12; // Convert feet to inches
+        // Handles inputs like "5" (assuming feet) or "70" (assuming inches).
+        // Sticking to assuming feet if no ' as per the BMR logic.
+        const feet = parseFloat(heightStr) || 0; // Assume input like "5" means 5 feet
+        totalInches = feet * 12; // Convert feet to inches
     }
     heightInM = totalInches * 0.0254; // Convert total inches to meters
 
@@ -231,13 +231,13 @@ export function calculateMacroGrams(
   carbsPercent: number,
   fatPercent: number,
 ) {
-  // Ensure calories is not negative
-  const safeCalories = Math.max(0, calories);
+    // Ensure calories is not negative
+    const safeCalories = Math.max(0, calories);
 
-  // Defensive check: Ensure percentages are non-negative
-  const safeProteinPercent = Math.max(0, proteinPercent);
-  const safeCarbsPercent = Math.max(0, carbsPercent);
-  const safeFatPercent = Math.max(0, fatPercent);
+    // Defensive check: Ensure percentages are non-negative
+    const safeProteinPercent = Math.max(0, proteinPercent);
+    const safeCarbsPercent = Math.max(0, carbsPercent);
+    const safeFatPercent = Math.max(0, fatPercent);
 
 
   const proteinGrams = Math.round((safeCalories * (safeProteinPercent / 100)) / 4);
